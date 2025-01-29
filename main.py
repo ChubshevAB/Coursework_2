@@ -3,7 +3,6 @@ from src.api import HHAPI
 from src.vacancy import Vacancy
 from src.storage import JSONStorage
 
-
 def user_interface():
     '''Осуществляет взаимодействие с пользователем через консоль'''
 
@@ -24,10 +23,11 @@ def user_interface():
             try:
                 vacancies = api.fetch_vacancies(query)
                 for item in vacancies:
+                    salary = item['salary']['from'] if item['salary'] else 0
                     vacancy = Vacancy(
                         title=item['name'],
                         url=item['alternate_url'],
-                        salary=item['salary']['from'] if item['salary'] else 0,
+                        salary=salary,
                         description=item['snippet']['requirement']
                     )
                     storage.add_vacancy(vacancy)
