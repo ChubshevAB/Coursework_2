@@ -3,6 +3,7 @@ import os
 from abc import ABC, abstractmethod
 from src.vacancy import Vacancy
 
+
 # Абстрактный класс для хранения вакансий
 class AbstractStorage(ABC):
     @abstractmethod
@@ -16,6 +17,7 @@ class AbstractStorage(ABC):
     @abstractmethod
     def remove_vacancy(self, title: str):
         pass
+
 
 # Класс для хранения вакансий в JSON-файле
 class JSONStorage(AbstractStorage):
@@ -31,7 +33,10 @@ class JSONStorage(AbstractStorage):
             return
 
         with open(self.filename, "r", encoding="utf-8") as f:
-            self.vacancies = [Vacancy(**item) for item in json.load(f)]
+            try:
+                self.vacancies = [Vacancy(**item) for item in json.load(f)]
+            except json.JSONDecodeError:
+                self.vacancies = []
 
     def _save(self):
         """Сохраняет текущий список вакансий в JSON-файл"""
@@ -61,4 +66,12 @@ class JSONStorage(AbstractStorage):
         self.vacancies = [
             vacancy for vacancy in self.vacancies if vacancy.title != title
         ]
+        self._save()
+
+    def append_vacancy(self, vacancy: Vacancy):
+        """Добавляет вакансию, если она валидна, и не дублирует существующие"""
+        if any(vac.title == vacancy.title for vac in self.vacancies):
+            raise ValueError(f"Vacancy with title '{vacancy.title}' already exists.")
+
+        self.vacancies.append(vacancy)
         self._save()
