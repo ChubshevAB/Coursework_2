@@ -23,15 +23,20 @@ def user_interface():
             try:
                 vacancies = api.fetch_vacancies(query)
                 for item in vacancies:
-                    salary = item['salary']['from'] if item['salary'] else 0
+                    salary_info = item.get('salary')
+                    salary = salary_info['from'] if salary_info and salary_info['from'] else 0
                     vacancy = Vacancy(
                         title=item['name'],
                         url=item['alternate_url'],
                         salary=salary,
                         description=item['snippet']['requirement']
                     )
-                    storage.add_vacancy(vacancy)
-                print("Вакансии успешно добавлены.")
+                    try:
+                        storage.append_vacancy(vacancy)
+                        print(f"Добавлена вакансия: {vacancy.title}")
+                    except ValueError as e:
+                        print(e)
+                print("Обработка вакансий завершена.")
 
             except Exception as e:
                 print(f"Ошибка: {e}")

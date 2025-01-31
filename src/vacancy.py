@@ -4,7 +4,7 @@ class Vacancy:
         self._url = url
         self._salary = salary
         self._description = description
-        self.validate()
+        self._validate()
 
     @property
     def title(self):
@@ -28,23 +28,25 @@ class Vacancy:
     def __gt__(self, other):
         return self.salary > other.salary
 
-    def validate(self):
-        """Метод валидации для проверки корректности значений атрибутов вакансии. Проверяет, что зарплата является
-        числом и что название, URL и описание — строки. Если проверки не пройдены, выбрасывает исключение ValueError
-        """
+    def _validate(self):
+        """Метод валидации для проверки корректности значений атрибутов вакансии."""
+        self._validate_salary(self._salary)
+        self._validate_string(self._title, "Title")
+        self._validate_string(self._url, "URL")
+        self._validate_string(self._description, "Description")
 
-        if not isinstance(self._salary, (int, float)):
-            raise ValueError("Salary must be a number.")
-        if (
-            not isinstance(self._title, str)
-            or not isinstance(self._url, str)
-            or not isinstance(self._description, str)
-        ):
-            raise ValueError("Title, URL, and description must be strings.")
+    def _validate_salary(self, salary):
+        """Проверяет, что зарплата является числом."""
+        if not isinstance(salary, (int, float)):
+            raise ValueError(f"Invalid salary: '{salary}'. Salary must be a number.")
+
+    def _validate_string(self, value, name):
+        """Проверяет, что значение является строкой."""
+        if not isinstance(value, str):
+            raise ValueError(f"Invalid {name}: '{value}'. {name} must be a string.")
 
     def to_dict(self):
         """Преобразует объект вакансии в словарь с ключами для названия, URL, зарплаты и описания"""
-
         return {
             "title": self.title,
             "url": self.url,
